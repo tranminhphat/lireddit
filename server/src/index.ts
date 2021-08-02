@@ -1,5 +1,6 @@
+import express, { Application } from "express";
 import { createConnection } from "typeorm";
-import { Post } from "./entities/Post";
+import router from "./routes";
 
 const main = async () => {
 	const conn = await createConnection({
@@ -12,9 +13,9 @@ const main = async () => {
 		entities: [__dirname + "/entities/*.js"],
 	});
 
-	await Post.create({ title: "my first post" }).save();
-	const post = await Post.find();
-	console.log(post);
+	const app: Application = express();
+	app.listen(4000, () => console.log("Server started on port 4000"));
+	app.use(router);
 };
 
 main();
