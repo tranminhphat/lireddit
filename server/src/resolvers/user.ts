@@ -1,13 +1,13 @@
 import argon2 from "argon2";
 import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
-import { CredentialsInput, UserResponse } from "../types/graphql";
+import { LoginInput, RegisterInput, UserResponse } from "../types/graphql";
 
 @Resolver()
 export class UserResolver {
 	@Mutation(() => UserResponse)
 	async register(
-		@Arg("options") options: CredentialsInput
+		@Arg("options") options: RegisterInput
 	): Promise<UserResponse> {
 		const { username, email, password } = options;
 		const hashedPassword = await argon2.hash(password);
@@ -63,6 +63,37 @@ export class UserResolver {
 				};
 			}
 		}
+		return { user };
+	}
+
+	@Mutation(() => UserResponse)
+	async login(@Arg("options") options: LoginInput): Promise<UserResponse> {
+		const { username, password } = options;
+		const user = await User.findOne({ username });
+
+		if (!user) {
+			return {
+				errors: [
+					{
+						field: "username",
+						message: "incorrect username or password",
+					},
+				],
+			};
+		}
+
+		const isValidPassword = await argon2.verify(user.password, password);
+		if (!isValidPassword) {
+			return {
+				errors: [
+					{
+						field: "password",
+						message: "incorrect username or password",
+					},
+				],
+			};
+		}
+
 		return { user };
 	}
 

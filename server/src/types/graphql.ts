@@ -3,13 +3,18 @@ import { User } from "../entities/User";
 
 // Input types
 @InputType()
-export class CredentialsInput {
+export class RegisterInput {
 	@Field()
 	username: string;
-
 	@Field()
 	email: string;
-
+	@Field()
+	password: string;
+}
+@InputType()
+export class LoginInput {
+	@Field()
+	username: string;
 	@Field()
 	password: string;
 }
@@ -18,7 +23,6 @@ export class CredentialsInput {
 export class FieldError {
 	@Field()
 	field: string;
-
 	@Field()
 	message: string;
 }
@@ -28,7 +32,6 @@ export class FieldError {
 export class UserResponse {
 	@Field(() => [FieldError], { nullable: true })
 	errors?: FieldError[];
-
 	@Field(() => User, { nullable: true })
 	user?: User;
 }
