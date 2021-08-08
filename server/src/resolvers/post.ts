@@ -32,7 +32,7 @@ export class PostResolver {
 
 		if (typeof title !== undefined) {
 			post.title = title;
-			Post.update(id, post);
+			Post.update({ id }, { title });
 		}
 
 		return post;
