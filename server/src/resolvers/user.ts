@@ -1,13 +1,15 @@
 import argon2 from "argon2";
-import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
+import { MyContext } from "src/types";
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
-import { LoginInput, RegisterInput, UserResponse } from "../types/graphql";
+import { LoginInput, RegisterInput, UserResponse } from "../graphql-types";
 
 @Resolver()
 export class UserResolver {
 	@Mutation(() => UserResponse)
 	async register(
-		@Arg("options") options: RegisterInput
+		@Arg("options") options: RegisterInput,
+		@Ctx() { req }: MyContext
 	): Promise<UserResponse> {
 		const { username, email, password } = options;
 		const hashedPassword = await argon2.hash(password);
@@ -63,11 +65,17 @@ export class UserResolver {
 				};
 			}
 		}
+		// store user into session
+		req.session.userId = user.id;
+
 		return { user };
 	}
 
 	@Mutation(() => UserResponse)
-	async login(@Arg("options") options: LoginInput): Promise<UserResponse> {
+	async login(
+		@Arg("options") options: LoginInput,
+		@Ctx() { req }: MyContext
+	): Promise<UserResponse> {
 		const { username, password } = options;
 		const user = await User.findOne({ username });
 
@@ -93,6 +101,8 @@ export class UserResolver {
 				],
 			};
 		}
+		// store user into session
+		req.session.userId = user.id;
 
 		return { user };
 	}
