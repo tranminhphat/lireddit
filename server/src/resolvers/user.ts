@@ -3,7 +3,6 @@ import { MyContext } from "src/types";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
 import { LoginInput, RegisterInput, UserResponse } from "../graphql-types";
-
 @Resolver()
 export class UserResolver {
 	@Mutation(() => UserResponse)

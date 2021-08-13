@@ -1,6 +1,7 @@
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import connectRedis from "connect-redis";
+import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
 import redis from "redis";
@@ -9,7 +10,7 @@ import { createConnection } from "typeorm";
 import { IN_PRODUCTION } from "./constants";
 
 const main = async () => {
-	const conn = await createConnection({
+	await createConnection({
 		type: "postgres",
 		database: "lireddit",
 		username: "postgres",
@@ -24,9 +25,19 @@ const main = async () => {
 	const redisClient = redis.createClient();
 
 	app.use(
+		cors({
+			origin: "http://localhost:3000",
+			credentials: true,
+		})
+	);
+
+	app.use(
 		session({
 			name: "qid",
-			store: new RedisStore({ client: redisClient, disableTouch: true }),
+			store: new RedisStore({
+				client: redisClient,
+				disableTouch: true,
+			}),
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
 				httpOnly: true,
@@ -50,7 +61,10 @@ const main = async () => {
 	});
 
 	await apolloServer.start();
-	apolloServer.applyMiddleware({ app });
+	apolloServer.applyMiddleware({
+		app,
+		cors: false,
+	});
 
 	app.listen(4000, () => console.log("Server started on port 4000"));
 };
