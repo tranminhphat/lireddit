@@ -1,8 +1,9 @@
 import argon2 from "argon2";
-import { MyContext } from "src/types";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
+import { AUTH_COOKIE } from "../constants";
 import { User } from "../entities/User";
 import { LoginInput, RegisterInput, UserResponse } from "../graphql-types";
+import { MyContext } from "../types";
 @Resolver()
 export class UserResolver {
 	@Query(() => User, { nullable: true })
@@ -115,6 +116,20 @@ export class UserResolver {
 		req.session.userId = user.id;
 
 		return { user };
+	}
+
+	@Mutation(() => Boolean)
+	async logout(@Ctx() { req, res }: MyContext): Promise<boolean> {
+		return new Promise((resolve) => {
+			res.clearCookie(AUTH_COOKIE);
+			req.session.destroy((err) => {
+				console.error(err);
+				resolve(false);
+				return;
+			});
+
+			resolve(true);
+		});
 	}
 
 	@Query(() => [User])

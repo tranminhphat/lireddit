@@ -7,7 +7,7 @@ import session from "express-session";
 import redis from "redis";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
-import { IN_PRODUCTION } from "./constants";
+import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
 
 const main = async () => {
 	await createConnection({
@@ -33,7 +33,7 @@ const main = async () => {
 
 	app.use(
 		session({
-			name: "qid",
+			name: AUTH_COOKIE,
 			store: new RedisStore({
 				client: redisClient,
 				disableTouch: true,
