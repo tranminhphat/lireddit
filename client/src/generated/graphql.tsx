@@ -32,6 +32,7 @@ export type Mutation = {
   deletePost: Scalars['Boolean'];
   register: UserResponse;
   login: UserResponse;
+  logout: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
 };
 
@@ -78,6 +79,7 @@ export type Query = {
   __typename?: 'Query';
   posts: Array<Post>;
   post?: Maybe<Post>;
+  currentUser?: Maybe<User>;
   users: Array<User>;
   user?: Maybe<User>;
 };
@@ -113,28 +115,44 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type RegularUserFragment = { __typename?: 'User', id: number, email: string, username: string };
+
 export type LoginMutationVariables = Exact<{
   options: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: Maybe<{ __typename?: 'User', id: number, username: string, email: string }>, errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: Maybe<{ __typename?: 'User', id: number, email: string, username: string }>, errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>> } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
   options: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', user?: Maybe<{ __typename?: 'User', id: number, username: string, email: string }>, errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', user?: Maybe<{ __typename?: 'User', id: number, email: string, username: string }>, errors?: Maybe<Array<{ __typename?: 'FieldError', field: string, message: string }>> } };
+
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
+export type CurrentUserQuery = { __typename?: 'Query', currentUser?: Maybe<{ __typename?: 'User', id: number, email: string, username: string }> };
+
+export const RegularUserFragmentDoc = gql`
+    fragment RegularUser on User {
+  id
+  email
+  username
+}
+    `;
 export const LoginDocument = gql`
     mutation Login($options: LoginInput!) {
   login(options: $options) {
     user {
-      id
-      username
-      email
+      ...RegularUser
     }
     errors {
       field
@@ -142,18 +160,25 @@ export const LoginDocument = gql`
     }
   }
 }
-    `;
+    ${RegularUserFragmentDoc}`;
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterDocument = gql`
     mutation Register($options: RegisterInput!) {
   register(options: $options) {
     user {
-      id
-      username
-      email
+      ...RegularUser
     }
     errors {
       field
@@ -161,8 +186,19 @@ export const RegisterDocument = gql`
     }
   }
 }
-    `;
+    ${RegularUserFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const CurrentUserDocument = gql`
+    query CurrentUser {
+  currentUser {
+    ...RegularUser
+  }
+}
+    ${RegularUserFragmentDoc}`;
+
+export function useCurrentUserQuery(options: Omit<Urql.UseQueryArgs<CurrentUserQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<CurrentUserQuery>({ query: CurrentUserDocument, ...options });
 };
