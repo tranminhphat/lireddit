@@ -1,35 +1,21 @@
 import { Box, Button, Container } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import * as React from "react";
-import { useMutation } from "urql";
 import InputField from "../components/InputField";
+import { useRegisterMutation } from "../generated/graphql";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface RegisterPageProps {}
 
-const REGISTER_MUTATION = `
-	mutation Register($email: String!, $username: String!, $password: String!) {
-		register(options: {email: $email, username: $username, password: $password}) {
-			user {
-				id
-				username
-				email
-			}
-			errors {
-				field
-				message
-			}
-		}
-	}
-`;
-
 const RegisterPage: React.FC<RegisterPageProps> = () => {
-	const [, register] = useMutation(REGISTER_MUTATION);
+	const [, register] = useRegisterMutation();
 	return (
 		<Container mt={8}>
 			<Formik
 				initialValues={{ email: "", username: "", password: "" }}
-				onSubmit={(values) => register(values)}
+				onSubmit={async (values) => {
+					const result = await register(values);
+				}}
 			>
 				{({ isSubmitting }) => (
 					<Form>
