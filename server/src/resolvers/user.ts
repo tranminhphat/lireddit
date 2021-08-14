@@ -5,6 +5,17 @@ import { User } from "../entities/User";
 import { LoginInput, RegisterInput, UserResponse } from "../graphql-types";
 @Resolver()
 export class UserResolver {
+	@Query(() => User, { nullable: true })
+	currentUser(@Ctx() { req }: MyContext): Promise<User | undefined> | null {
+		const { userId } = req.session;
+		if (!userId) {
+			return null; // no user is logged in;
+		}
+
+		const user = User.findOne(userId);
+		return user;
+	}
+
 	@Mutation(() => UserResponse)
 	async register(
 		@Arg("options") options: RegisterInput,
