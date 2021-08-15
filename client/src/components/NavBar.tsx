@@ -4,7 +4,9 @@ import * as React from "react";
 import { useCurrentUserQuery, useLogoutMutation } from "../generated/graphql";
 
 const NavBar: React.FC = () => {
-	const [{ fetching, data }] = useCurrentUserQuery();
+	const [{ fetching, data }] = useCurrentUserQuery({
+		// pause: IS_SERVER,
+	});
 	const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
 
 	const NavBarBody = () => {

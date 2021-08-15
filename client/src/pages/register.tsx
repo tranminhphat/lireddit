@@ -1,9 +1,11 @@
 import { Box, Button, Container } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
+import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/dist/client/router";
 import * as React from "react";
 import InputField from "../components/InputField";
 import { useRegisterMutation } from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
 import { toErrorMap } from "../utils/toErrorMap";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -66,4 +68,4 @@ const RegisterPage: React.FC<RegisterPageProps> = () => {
 	);
 };
 
-export default RegisterPage;
+export default withUrqlClient(createUrqlClient)(RegisterPage);
