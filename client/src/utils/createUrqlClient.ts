@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { dedupExchange, fetchExchange } from "urql";
 import {
@@ -19,7 +20,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
 		cacheExchange({
 			updates: {
 				Mutation: {
-					logout: (result, args, cache, info) => {
+					logout: (result, _args, cache, _info) => {
 						betterUpdateQuery<LogoutMutation, CurrentUserQuery>(
 							cache,
 							{ query: CurrentUserDocument },
@@ -27,7 +28,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
 							() => ({ currentUser: null })
 						);
 					},
-					login: (result, args, cache, info) => {
+					login: (result, _args, cache, _info) => {
 						betterUpdateQuery<LoginMutation, CurrentUserQuery>(
 							cache,
 							{ query: CurrentUserDocument },
@@ -43,7 +44,7 @@ export const createUrqlClient = (ssrExchange: any) => ({
 							}
 						);
 					},
-					register: (result, args, cache, info) => {
+					register: (result, _args, cache, _info) => {
 						betterUpdateQuery<RegisterMutation, CurrentUserQuery>(
 							cache,
 							{ query: CurrentUserDocument },

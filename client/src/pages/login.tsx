@@ -1,17 +1,15 @@
-import { Box, Button, Container } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/dist/client/router";
+import NextLink from "next/link";
 import * as React from "react";
 import InputField from "../components/InputField";
 import { useLoginMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { toErrorMap } from "../utils/toErrorMap";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface LoginPageProps {}
-
-const LoginPage: React.FC<LoginPageProps> = () => {
+const LoginPage: React.FC = () => {
 	const [, login] = useLoginMutation();
 	const router = useRouter();
 	return (
@@ -45,6 +43,13 @@ const LoginPage: React.FC<LoginPageProps> = () => {
 								type="password"
 							/>
 						</Box>
+						<Flex mt={4}>
+							<Box ml="auto">
+								<NextLink href="/forgot-password">
+									<Link>forgot your password?</Link>
+								</NextLink>
+							</Box>
+						</Flex>
 						<Button
 							mt={4}
 							type="submit"
