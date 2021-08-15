@@ -25,6 +25,17 @@ export class UserResolver {
 		const { username, email, password } = options;
 		const hashedPassword = await argon2.hash(password);
 
+		if (!email.includes("@")) {
+			return {
+				errors: [
+					{
+						field: "email",
+						message: "invalid email",
+					},
+				],
+			};
+		}
+
 		if (username.length <= 3) {
 			return {
 				errors: [
