@@ -54,7 +54,7 @@ const main = async () => {
 			resolvers: [__dirname + "/resolvers/*.js"],
 			validate: false,
 		}),
-		context: ({ req, res }) => ({ req, res }),
+		context: ({ req, res }) => ({ req, res, redis: redisClient }),
 		plugins: [
 			ApolloServerPluginLandingPageGraphQLPlayground(), // using the old playground
 		],

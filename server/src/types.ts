@@ -7,6 +7,6 @@ export type MyContext = {
 		session: session.Session &
 			Partial<session.SessionData> & { userId: number };
 	};
-	redis: Redis;
 	res: Response;
+	redis: Redis;
 };
