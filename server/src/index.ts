@@ -4,7 +4,7 @@ import connectRedis from "connect-redis";
 import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
-import redis from "redis";
+import Redis from "ioredis";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
@@ -22,7 +22,7 @@ const main = async () => {
 
 	const app: Application = express();
 	const RedisStore = connectRedis(session);
-	const redisClient = redis.createClient();
+	const redisClient = new Redis();
 
 	app.use(
 		cors({

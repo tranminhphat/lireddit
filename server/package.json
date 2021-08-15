@@ -18,7 +18,6 @@
     "@types/express-session": "^1.17.4",
     "@types/node": "^16.4.8",
     "@types/nodemailer": "^6.4.4",
-    "@types/redis": "^2.8.31",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
     "eslint": "^7.32.0",
@@ -27,6 +26,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "@types/ioredis": "^4.26.7",
     "apollo-server-express": "^3.1.1",
     "argon2": "^0.28.2",
     "connect-redis": "^6.0.0",
@@ -34,9 +34,9 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "graphql": "^15.5.1",
+    "ioredis": "^4.27.7",
     "nodemailer": "^6.6.3",
     "pg": "^8.7.1",
-    "redis": "^3.1.2",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.36"

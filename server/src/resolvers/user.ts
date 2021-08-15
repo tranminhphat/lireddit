@@ -4,6 +4,7 @@ import { AUTH_COOKIE } from "../constants";
 import { User } from "../entities/User";
 import { LoginInput, RegisterInput, UserResponse } from "../graphql-types";
 import { MyContext } from "../types";
+import { validateRegister } from "../utils/validateRegister";
 @Resolver()
 export class UserResolver {
 	@Query(() => User, { nullable: true })
@@ -24,39 +25,12 @@ export class UserResolver {
 	): Promise<UserResponse> {
 		const { username, email, password } = options;
 		const hashedPassword = await argon2.hash(password);
+		const errors = validateRegister(options);
 
-		if (!email.includes("@")) {
-			return {
-				errors: [
-					{
-						field: "email",
-						message: "invalid email",
-					},
-				],
-			};
+		if (errors) {
+			return { errors };
 		}
 
-		if (username.length <= 3) {
-			return {
-				errors: [
-					{
-						field: "username",
-						message: "username must be greater than 3 characters",
-					},
-				],
-			};
-		}
-
-		if (password.length <= 3) {
-			return {
-				errors: [
-					{
-						field: "password",
-						message: "password must be greater than 3 characters",
-					},
-				],
-			};
-		}
 		const user = User.create({
 			username,
 			email,
