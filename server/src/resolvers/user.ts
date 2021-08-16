@@ -16,8 +16,7 @@ export class UserResolver {
 			return null; // no user is logged in;
 		}
 
-		const user = User.findOne(userId);
-		return user;
+		return User.findOne(userId);
 	}
 
 	@Mutation(() => UserResponse)

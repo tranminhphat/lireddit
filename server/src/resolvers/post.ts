@@ -31,7 +31,6 @@ export class PostResolver {
 		}
 
 		if (typeof title !== undefined) {
-			post.title = title;
 			Post.update({ id }, { title });
 		}
 
@@ -40,7 +39,7 @@ export class PostResolver {
 
 	@Mutation(() => Boolean)
 	async deletePost(@Arg("id", () => Int) id: number): Promise<boolean> {
-		await Post.delete({ id });
+		await Post.delete(id);
 		return true;
 	}
 }
