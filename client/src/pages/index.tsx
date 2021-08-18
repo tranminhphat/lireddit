@@ -1,4 +1,6 @@
+import { Link } from "@chakra-ui/layout";
 import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
 import React from "react";
 import Layout from "../components/Layout";
 import { usePostsQuery } from "../generated/graphql";
@@ -8,7 +10,11 @@ const Index = (): React.ReactElement => {
 	const [{ data }] = usePostsQuery();
 
 	return (
-		<Layout>
+		<Layout size="xl">
+			<NextLink href="create-post">
+				<Link>create post</Link>
+			</NextLink>
+			<br />
 			<div>Hello world</div>
 			{!data ? (
 				<div>...loading</div>
