@@ -1,5 +1,16 @@
-import { Arg, Int, Mutation, Query, Resolver } from "type-graphql";
+import {
+	Arg,
+	Ctx,
+	Int,
+	Mutation,
+	Query,
+	Resolver,
+	UseMiddleware,
+} from "type-graphql";
 import { Post } from "../entities/Post";
+import { PostInput } from "../graphql-types";
+import { isAuth } from "../middlewares/isAuth";
+import { MyContext } from "../types";
 
 @Resolver()
 export class PostResolver {
@@ -14,9 +25,14 @@ export class PostResolver {
 	}
 
 	@Mutation(() => Post)
-	async createPost(@Arg("title") title: string): Promise<Post> {
+	@UseMiddleware(isAuth)
+	async createPost(
+		@Arg("options") options: PostInput,
+		@Ctx() { req }: MyContext
+	): Promise<Post> {
 		return Post.create({
-			title,
+			...options,
+			creatorId: req.session.userId,
 		}).save();
 	}
 

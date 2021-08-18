@@ -19,6 +19,15 @@ export class LoginInput {
 	password: string;
 }
 
+@InputType()
+export class PostInput {
+	@Field()
+	title: string;
+	@Field()
+	text: string;
+}
+
+// Object types
 @ObjectType()
 export class FieldError {
 	@Field()
@@ -27,7 +36,6 @@ export class FieldError {
 	message: string;
 }
 
-// Object types
 @ObjectType()
 export class UserResponse {
 	@Field(() => [FieldError], { nullable: true })
