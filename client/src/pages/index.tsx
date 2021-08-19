@@ -7,7 +7,11 @@ import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = (): React.ReactElement => {
-	const [{ data }] = usePostsQuery();
+	const [{ data }] = usePostsQuery({
+		variables: {
+			limit: 5,
+		},
+	});
 
 	return (
 		<Layout size="xl">
@@ -15,7 +19,6 @@ const Index = (): React.ReactElement => {
 				<Link>create post</Link>
 			</NextLink>
 			<br />
-			<div>Hello world</div>
 			{!data ? (
 				<div>...loading</div>
 			) : (
