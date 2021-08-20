@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { cacheExchange } from "@urql/exchange-graphcache";
+import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import Router from "next/router";
 import { dedupExchange, Exchange, fetchExchange } from "urql";
 import { pipe, tap } from "wonka";
@@ -25,6 +25,30 @@ const errorExchange: Exchange =
 		);
 	};
 
+// refactor from simplePagination()
+const cursorPagination = (): Resolver => {
+	return (_parent, fieldArgs, cache, info) => {
+		const { parentKey: entityKey, fieldName } = info;
+		const allFields = cache.inspectFields(entityKey);
+		const fieldInfos = allFields.filter((info) => info.fieldName === fieldName);
+		const size = fieldInfos.length;
+		if (size === 0) {
+			return undefined;
+		}
+
+		const isDataInTheCache = cache.resolve(entityKey, fieldName, fieldArgs);
+		// do partial for the next cursor pagination query
+		info.partial = !isDataInTheCache;
+		const result: string[] = [];
+		fieldInfos.forEach((fi) => {
+			const data = cache.resolve(entityKey, fi.fieldKey) as string[];
+			result.push(...data);
+		});
+
+		return result;
+	};
+};
+
 export const createUrqlClient = (ssrExchange: any) => ({
 	url: "http://localhost:4000/graphql",
 	fetchOptions: {
@@ -33,6 +57,11 @@ export const createUrqlClient = (ssrExchange: any) => ({
 	exchanges: [
 		dedupExchange,
 		cacheExchange({
+			resolvers: {
+				Query: {
+					posts: cursorPagination(),
+				},
+			},
 			updates: {
 				Mutation: {
 					logout: (result, _args, cache, _info) => {
