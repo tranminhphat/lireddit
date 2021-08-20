@@ -10,6 +10,7 @@ import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
 
+//rerun
 const main = async () => {
 	const conn = await createConnection({
 		type: "postgres",
