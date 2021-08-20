@@ -5,20 +5,24 @@ import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
 import Redis from "ioredis";
+import path from "path";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
 
 const main = async () => {
-	await createConnection({
+	const conn = await createConnection({
 		type: "postgres",
 		database: "lireddit",
 		username: "postgres",
 		password: "201199",
 		logging: true,
 		synchronize: true,
+		migrations: [path.join(__dirname, "./migrations/*")],
 		entities: [__dirname + "/entities/*.js"],
 	});
+
+	await conn.runMigrations();
 
 	const app: Application = express();
 	const RedisStore = connectRedis(session);
