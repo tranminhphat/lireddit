@@ -32,6 +32,12 @@ const Index = (): React.ReactElement => {
 					{queryData?.posts.data.map((p) => (
 						<Box key={p.id} p={5} shadow="md" borderWidth="1px">
 							<Heading fontSize="xl">{p.title}</Heading>
+							<Flex>
+								<Text>posted by</Text>
+								<Text ml={1} fontWeight="bold">
+									{p.creator.username}
+								</Text>
+							</Flex>
 							<Text mt={4}>{p.textSnippet}</Text>
 						</Box>
 					))}
