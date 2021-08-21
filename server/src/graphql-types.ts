@@ -1,4 +1,5 @@
 import { Field, InputType, ObjectType } from "type-graphql";
+import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 
 // Input types
@@ -42,4 +43,12 @@ export class UserResponse {
 	errors?: FieldError[];
 	@Field(() => User, { nullable: true })
 	user?: User;
+}
+
+@ObjectType()
+export class PaginatedPosts {
+	@Field(() => [Post])
+	data: Post[];
+	@Field()
+	hasMore: boolean;
 }
