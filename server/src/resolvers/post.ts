@@ -33,11 +33,12 @@ export class PostResolver {
 		const qb = getConnection()
 			.getRepository(Post)
 			.createQueryBuilder("p")
-			.orderBy('"createdAt"', "DESC")
+			.innerJoinAndSelect("p.creator", "u")
+			.orderBy("p.createdAt", "DESC")
 			.take(realLimitPlusOne);
 
 		if (cursor) {
-			qb.where('"createdAt" < :cursor', {
+			qb.where("p.createdAt < :cursor", {
 				cursor: new Date(parseInt(cursor)),
 			});
 		}
