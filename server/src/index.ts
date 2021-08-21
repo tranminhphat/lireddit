@@ -10,7 +10,6 @@ import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
 
-//rerun
 const main = async () => {
 	const conn = await createConnection({
 		type: "postgres",
@@ -24,6 +23,7 @@ const main = async () => {
 	});
 
 	await conn.runMigrations();
+	// await Updoot.delete({});
 
 	const app: Application = express();
 	const RedisStore = connectRedis(session);
