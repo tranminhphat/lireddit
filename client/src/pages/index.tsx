@@ -9,10 +9,10 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = (): React.ReactElement => {
 	const [pagination, setPagination] = useState({
-		limit: 10,
+		limit: 33,
 		cursor: null as string | null,
 	});
-	const [{ data, fetching }] = usePostsQuery({
+	const [{ data: queryData, fetching }] = usePostsQuery({
 		variables: pagination,
 	});
 
@@ -25,11 +25,11 @@ const Index = (): React.ReactElement => {
 				</NextLink>
 			</Flex>
 			<br />
-			{!data && fetching ? (
+			{!queryData && fetching ? (
 				<div>...loading</div>
 			) : (
 				<Stack spacing={8}>
-					{data?.posts.map((p) => (
+					{queryData?.posts.data.map((p) => (
 						<Box key={p.id} p={5} shadow="md" borderWidth="1px">
 							<Heading fontSize="xl">{p.title}</Heading>
 							<Text mt={4}>{p.textSnippet}</Text>
@@ -37,13 +37,15 @@ const Index = (): React.ReactElement => {
 					))}
 				</Stack>
 			)}
-			{data ? (
+			{queryData && queryData.posts.hasMore ? (
 				<Flex>
 					<Button
 						onClick={() =>
 							setPagination({
 								limit: pagination.limit,
-								cursor: data.posts[data.posts.length - 1].createdAt,
+								cursor:
+									queryData.posts.data[queryData.posts.data.length - 1]
+										.createdAt,
 							})
 						}
 						isLoading={fetching}
