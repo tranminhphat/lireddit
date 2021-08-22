@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
+import { Cache, cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import gql from "graphql-tag";
 import { NextPageContext } from "next";
 import { SSRExchange } from "next-urql";
@@ -67,6 +67,15 @@ const cursorPagination = (): Resolver => {
 	};
 };
 
+const invalidateAllPosts = (cache: Cache) => {
+	const allFields = cache.inspectFields("Query");
+	const fieldInfos = allFields.filter((info) => info.fieldName === "posts");
+
+	fieldInfos.forEach((fi) => {
+		cache.invalidate("Query", "posts", fi.arguments);
+	});
+};
+
 export const createUrqlClient = (
 	ssrExchange: SSRExchange,
 	ctx?: NextPageContext
@@ -128,14 +137,7 @@ export const createUrqlClient = (
 							}
 						},
 						createPost: (result, _args, cache, _info) => {
-							const allFields = cache.inspectFields("Query");
-							const fieldInfos = allFields.filter(
-								(info) => info.fieldName === "posts"
-							);
-
-							fieldInfos.forEach((fi) => {
-								cache.invalidate("Query", "posts", fi.arguments);
-							});
+							invalidateAllPosts(cache);
 						},
 						logout: (result, _args, cache, _info) => {
 							betterUpdateQuery<LogoutMutation, CurrentUserQuery>(
@@ -160,6 +162,7 @@ export const createUrqlClient = (
 									}
 								}
 							);
+							invalidateAllPosts(cache);
 						},
 						register: (result, _args, cache, _info) => {
 							betterUpdateQuery<RegisterMutation, CurrentUserQuery>(

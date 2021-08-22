@@ -2,37 +2,32 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-co
 import { ApolloServer } from "apollo-server-express";
 import connectRedis from "connect-redis";
 import cors from "cors";
+import "dotenv-safe";
 import express, { Application } from "express";
 import session from "express-session";
 import Redis from "ioredis";
-import path from "path";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
+import serverConfig from "./config/index";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
 import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { createUserLoader } from "./utils/createUserLoader";
 
 const main = async () => {
-	const conn = await createConnection({
-		type: "postgres",
-		database: "lireddit",
-		username: "postgres",
-		password: "201199",
-		logging: true,
-		synchronize: true,
-		migrations: [path.join(__dirname, "./migrations/*")],
-		entities: [__dirname + "/entities/*.js"],
-	});
-
+	const conn = await createConnection(serverConfig);
 	await conn.runMigrations();
 
 	const app: Application = express();
 	const RedisStore = connectRedis(session);
-	const redisClient = new Redis();
+	const redisClient = new Redis(
+		process.env.REDIS_URL ? process.env.REDIS_URL : undefined
+	);
 
 	app.use(
 		cors({
-			origin: "http://localhost:3000",
+			origin: IN_PRODUCTION
+				? process.env.CORS_ORIGIN_PROD
+				: process.env.CORS_ORIGIN_DEV,
 			credentials: true,
 		})
 	);
@@ -49,9 +44,10 @@ const main = async () => {
 				httpOnly: true,
 				sameSite: "lax", // csrf // research this
 				secure: IN_PRODUCTION,
+				domain: IN_PRODUCTION ? ".vercel.app" : undefined,
 			},
 			saveUninitialized: false,
-			secret: "djaskldjasklfsdalgkhasdgklasd",
+			secret: (process.env.SESSION_SECRET as string) || "asdsadsadwqe1312",
 			resave: false,
 		})
 	);
@@ -78,7 +74,8 @@ const main = async () => {
 		cors: false,
 	});
 
-	app.listen(4000, () => console.log("Server started on port 4000"));
+	const PORT = process.env.PORT || 4000;
+	app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 };
 
 main();
