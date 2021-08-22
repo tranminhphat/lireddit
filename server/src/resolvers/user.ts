@@ -88,7 +88,7 @@ export class UserResolver {
 			};
 		}
 
-		const isValidPassword = await bcrypt.compare(user.password, password);
+		const isValidPassword = await bcrypt.compare(password, user.password);
 		if (!isValidPassword) {
 			return {
 				errors: [
