@@ -1,4 +1,4 @@
-import argon2 from "argon2";
+import bcrypt from "bcrypt";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { v4 } from "uuid";
 import { AUTH_COOKIE, FORGOT_PASSWORD_PREFIX } from "../constants";
@@ -25,7 +25,8 @@ export class UserResolver {
 		@Ctx() { req }: MyContext
 	): Promise<UserResponse> {
 		const { username, email, password } = options;
-		const hashedPassword = await argon2.hash(password);
+		const salt = await bcrypt.genSalt();
+		const hashedPassword = await bcrypt.hash(password, salt);
 		const errors = validateRegister(options);
 
 		if (errors) {
@@ -87,7 +88,7 @@ export class UserResolver {
 			};
 		}
 
-		const isValidPassword = await argon2.verify(user.password, password);
+		const isValidPassword = await bcrypt.compare(user.password, password);
 		if (!isValidPassword) {
 			return {
 				errors: [
@@ -197,7 +198,8 @@ export class UserResolver {
 				],
 			};
 		}
-		user.password = await argon2.hash(newPassword);
+		const salt = await bcrypt.genSalt();
+		user.password = await bcrypt.hash(newPassword, salt);
 		await user.save();
 		await redis.del(FORGOT_PASSWORD_PREFIX + token);
 		//log in user after change password

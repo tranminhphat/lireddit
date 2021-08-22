@@ -6,15 +6,30 @@ import "dotenv-safe";
 import express, { Application } from "express";
 import session from "express-session";
 import Redis from "ioredis";
+import path from "path";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
-import serverConfig from "./config/index";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
+import { Post } from "./entities/Post";
+import { Updoot } from "./entities/Updoot";
+import { User } from "./entities/User";
 import { createUpdootLoader } from "./utils/createUpdootLoader";
 import { createUserLoader } from "./utils/createUserLoader";
 
 const main = async () => {
-	const conn = await createConnection(serverConfig);
+	const conn = await createConnection({
+		type: "postgres",
+		url: process.env.DATABASE_URL,
+		logging: true,
+		migrations: [path.join(__dirname, "./migrations/*")],
+		entities: [Post, User, Updoot],
+		extra: {
+			ssl: {
+				rejectUnauthorized: false,
+			},
+		},
+		ssl: true,
+	});
 	await conn.runMigrations();
 
 	const app: Application = express();
