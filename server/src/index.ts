@@ -9,6 +9,8 @@ import path from "path";
 import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { AUTH_COOKIE, IN_PRODUCTION } from "./constants";
+import { createUpdootLoader } from "./utils/createUpdootLoader";
+import { createUserLoader } from "./utils/createUserLoader";
 
 const main = async () => {
 	const conn = await createConnection({
@@ -59,7 +61,13 @@ const main = async () => {
 			resolvers: [__dirname + "/resolvers/*.js"],
 			validate: false,
 		}),
-		context: ({ req, res }) => ({ req, res, redis: redisClient }),
+		context: ({ req, res }) => ({
+			req,
+			res,
+			redis: redisClient,
+			userLoader: createUserLoader(),
+			updootLoader: createUpdootLoader(),
+		}),
 		plugins: [
 			ApolloServerPluginLandingPageGraphQLPlayground(), // using the old playground
 		],
