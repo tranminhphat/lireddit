@@ -23,7 +23,6 @@ const main = async () => {
 	});
 
 	await conn.runMigrations();
-	// await Updoot.delete({});
 
 	const app: Application = express();
 	const RedisStore = connectRedis(session);
@@ -54,6 +53,7 @@ const main = async () => {
 			resave: false,
 		})
 	);
+
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
 			resolvers: [__dirname + "/resolvers/*.js"],
@@ -64,7 +64,6 @@ const main = async () => {
 			ApolloServerPluginLandingPageGraphQLPlayground(), // using the old playground
 		],
 	});
-
 	await apolloServer.start();
 	apolloServer.applyMiddleware({
 		app,
