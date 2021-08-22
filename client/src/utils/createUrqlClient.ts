@@ -10,6 +10,7 @@ import { IS_SERVER } from "../constants";
 import {
 	CurrentUserDocument,
 	CurrentUserQuery,
+	DeletePostMutationVariables,
 	LoginMutation,
 	LogoutMutation,
 	RegisterMutation,
@@ -90,6 +91,12 @@ export const createUrqlClient = (
 				},
 				updates: {
 					Mutation: {
+						deletePost: (result, args, cache, _info) => {
+							cache.invalidate({
+								__typename: "Post",
+								id: (args as DeletePostMutationVariables).id,
+							});
+						},
 						vote: (_result, args, cache, info) => {
 							const { postId, value } = args as VoteMutationVariables;
 							const data = cache.readFragment(
@@ -137,14 +144,6 @@ export const createUrqlClient = (
 								result,
 								() => ({ currentUser: null })
 							);
-							const allFields = cache.inspectFields("Query");
-							const fieldInfos = allFields.filter(
-								(info) => info.fieldName === "posts"
-							);
-
-							fieldInfos.forEach((fi) => {
-								cache.invalidate("Query", "posts", fi.arguments);
-							});
 						},
 						login: (result, _args, cache, _info) => {
 							betterUpdateQuery<LoginMutation, CurrentUserQuery>(
@@ -161,14 +160,6 @@ export const createUrqlClient = (
 									}
 								}
 							);
-							const allFields = cache.inspectFields("Query");
-							const fieldInfos = allFields.filter(
-								(info) => info.fieldName === "posts"
-							);
-
-							fieldInfos.forEach((fi) => {
-								cache.invalidate("Query", "posts", fi.arguments);
-							});
 						},
 						register: (result, _args, cache, _info) => {
 							betterUpdateQuery<RegisterMutation, CurrentUserQuery>(

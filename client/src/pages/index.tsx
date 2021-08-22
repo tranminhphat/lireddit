@@ -1,11 +1,20 @@
+import { DeleteIcon } from "@chakra-ui/icons";
 import { Link } from "@chakra-ui/layout";
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import {
+	Box,
+	Button,
+	Flex,
+	Heading,
+	IconButton,
+	Stack,
+	Text,
+} from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import UpdootSection from "../components/UpdootSection";
-import { usePostsQuery } from "../generated/graphql";
+import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = (): React.ReactElement => {
@@ -16,6 +25,8 @@ const Index = (): React.ReactElement => {
 	const [{ data: queryData, fetching }] = usePostsQuery({
 		variables: pagination,
 	});
+
+	const [, deletePost] = useDeletePostMutation();
 
 	if (!fetching && !queryData) {
 		return <div>you got query failed for some reason</div>;
@@ -34,21 +45,34 @@ const Index = (): React.ReactElement => {
 				<div>...loading</div>
 			) : (
 				<Stack spacing={8}>
-					{queryData?.posts.data.map((p) => (
-						<Flex key={p.id} p={5} shadow="md" borderWidth="1px">
-							<UpdootSection post={p} />
-							<Box>
-								<Heading fontSize="xl">{p.title}</Heading>
-								<Flex>
-									<Text>posted by</Text>
-									<Text ml={1} fontWeight="bold">
-										{p.creator.username}
-									</Text>
-								</Flex>
-								<Text mt={4}>{p.textSnippet}</Text>
-							</Box>
-						</Flex>
-					))}
+					{queryData?.posts.data.map((p) =>
+						!p ? null : (
+							<Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+								<UpdootSection post={p} />
+								<Box>
+									<NextLink href="/post/[id]" as={`/post/${p.id}`}>
+										<Link>
+											<Heading fontSize="xl">{p.title}</Heading>
+										</Link>
+									</NextLink>
+									<Flex>
+										<Text>posted by</Text>
+										<Text ml={1} fontWeight="bold">
+											{p.creator.username}
+										</Text>
+									</Flex>
+									<Text mt={4}>{p.textSnippet}</Text>
+								</Box>
+								<Box ml="auto">
+									<IconButton
+										onClick={async () => await deletePost({ id: p.id })}
+										aria-label="delete post"
+										icon={<DeleteIcon />}
+									/>
+								</Box>
+							</Flex>
+						)
+					)}
 				</Stack>
 			)}
 			{queryData && queryData.posts.hasMore ? (
@@ -74,4 +98,4 @@ const Index = (): React.ReactElement => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient, {ssr: true})(Index);
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
