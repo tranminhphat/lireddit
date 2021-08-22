@@ -10,12 +10,16 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = (): React.ReactElement => {
 	const [pagination, setPagination] = useState({
-		limit: 33,
+		limit: 15,
 		cursor: null as string | null,
 	});
 	const [{ data: queryData, fetching }] = usePostsQuery({
 		variables: pagination,
 	});
+
+	if (!fetching && !queryData) {
+		return <div>you got query failed for some reason</div>;
+	}
 
 	return (
 		<Layout size="md">
@@ -70,4 +74,4 @@ const Index = (): React.ReactElement => {
 	);
 };
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default withUrqlClient(createUrqlClient, {ssr: true})(Index);
