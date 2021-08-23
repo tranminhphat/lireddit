@@ -82,7 +82,10 @@ export const createUrqlClient = (
 ): ClientOptions => {
 	const cookie = IS_SERVER ? ctx?.req?.headers.cookie : "";
 	return {
-		url: "http://localhost:4000/graphql",
+		url:
+			process.env.NODE_ENV === "production"
+				? "https://glacial-tundra-52638.herokuapp.com/graphql"
+				: "http://localhost:4000/graphql",
 		fetchOptions: {
 			credentials: "include" as RequestCredentials,
 			headers: cookie ? { cookie } : undefined,
