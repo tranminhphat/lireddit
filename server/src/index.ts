@@ -47,6 +47,8 @@ const main = async () => {
 		})
 	);
 
+	app.set("trust proxy", 1);
+
 	app.use(
 		session({
 			name: AUTH_COOKIE,
@@ -57,12 +59,11 @@ const main = async () => {
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
 				httpOnly: true,
-				sameSite: "lax", // csrf // research this
+				sameSite: "none",
 				secure: IN_PRODUCTION,
-				domain: IN_PRODUCTION ? ".vercel.app" : undefined,
 			},
 			saveUninitialized: false,
-			secret: (process.env.SESSION_SECRET as string) || "asdsadsadwqe1312",
+			secret: process.env.SESSION_SECRET as string,
 			resave: false,
 		})
 	);
